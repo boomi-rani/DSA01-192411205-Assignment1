@@ -1,0 +1,145 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+enum Zone
+{
+    INNER = 1,
+    MIDDLE = 2,
+    OUTER = 3
+};
+
+class SmartCard
+{
+private:
+    string holderName;
+    long long balancePaise;
+
+public:
+    SmartCard(const string &name, long long balance)
+    {
+        holderName = name;
+        balancePaise = (balance >= 0) ? balance : 0;
+    }
+
+    bool isPeakHour(int hour)
+    {
+        return (hour >= 8 && hour < 10) || (hour >= 17 && hour < 20);
+    }
+
+    long long getFare(int zone, int hour)
+    {
+        long long fare = 0;
+
+        switch (zone)
+        {
+        case INNER:
+            fare = 1000;
+            break;
+        case MIDDLE:
+            fare = 2000;
+            break;
+        case OUTER:
+            fare = 3000;
+            break;
+        default:
+            return -1;
+        }
+
+        if (isPeakHour(hour))
+        {
+            fare += fare * 20 / 100;
+        }
+
+        return fare;
+    }
+
+    bool travel(int zone, int hour)
+    {
+        long long fare = getFare(zone, hour);
+
+        if (fare == -1)
+        {
+            cout << "Invalid zone." << endl;
+            return false;
+        }
+
+        if ((balancePaise - fare) < 5000)
+        {
+            cout << "Journey denied. Minimum remaining balance must be at least Rs.50." << endl;
+            return false;
+        }
+
+        balancePaise -= fare;
+
+        cout << "\nJourney successful." << endl;
+        cout << "Fare Charged: Rs." << fare / 100.0 << endl;
+        cout << "Remaining Balance: Rs." << balancePaise / 100.0 << endl;
+
+        return true;
+    }
+
+    void recharge(long long amountPaise)
+    {
+        if (amountPaise > 0)
+        {
+            balancePaise += amountPaise;
+        }
+    }
+
+    void showCard() const
+    {
+        cout << "\nCard Holder: " << holderName << endl;
+        cout << "Current Balance: Rs." << balancePaise / 100.0 << endl;
+    }
+};
+
+int main()
+{
+    string name;
+    long long balanceRupees;
+    int zone;
+    int hour;
+
+    cout << "City Metro Smart Card System\n";
+
+    cout << "Enter Card Holder Name: ";
+    getline(cin, name);
+
+    cout << "Enter Initial Balance (Rupees): ";
+
+    if (!(cin >> balanceRupees) || balanceRupees < 0)
+    {
+        cout << "Invalid balance input." << endl;
+        return 0;
+    }
+
+    cout << "Select Zone" << endl;
+    cout << "1. Inner Zone (Rs.10)" << endl;
+    cout << "2. Middle Zone (Rs.20)" << endl;
+    cout << "3. Outer Zone (Rs.30)" << endl;
+    cout << "Enter Zone: ";
+
+    if (!(cin >> zone))
+    {
+        cout << "Invalid zone input." << endl;
+        return 0;
+    }
+
+    cout << "Enter Travel Hour (0-23): ";
+
+    if (!(cin >> hour) || hour < 0 || hour > 23)
+    {
+        cout << "Invalid hour input." << endl;
+        return 0;
+    }
+
+    SmartCard card(name, balanceRupees * 100);
+
+    card.showCard();
+    card.travel(zone, hour);
+
+    cout << "\nStudent and Senior Citizen concessions require clarification because the assignment does not specify discount rules." << endl;
+
+    return 0;
+}
